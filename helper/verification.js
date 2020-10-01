@@ -17,11 +17,11 @@ authHelper.loginvalidation = [
 authHelper.takeexamvalidation = [
   check("sub_id", "subject Id is required").notEmpty().exists(),
 ];
-authHelper.questionaddvalidation = [
+/*authHelper.questionaddvalidation = [
   check('questions').isArray().exists(),
   check("questions.*.q_name", "Question name is required").isArray().exists(),
   check("questions.*.option", "Option is required").exists(),
   check("questions.*.answer", "Answer is required").exists(),
   check("questions.*.sub_id", "Sub_id is required").exists(),
-];
+];*/
 module.exports = authHelper;

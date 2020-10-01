@@ -17,6 +17,7 @@ if (result.error) {
 //database connect
 const mongoose = require("mongoose");
 mongoose.connect(con.DATABASE_URL);
+mongoose.set('useFindAndModify', false);
 
 const app = express();
 
@@ -33,8 +34,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/student', studentRouter);
 app.use('/teacher', teacherRouter);
-
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

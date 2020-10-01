@@ -70,6 +70,9 @@ router.get("/logout", function (req, res) {
   res.status(config.OK_STATUS).send("student logged out.");
 });
 
+
+
+
 router.post("/login", auth.loginvalidation, async function (req, res) {
   var student = req.body;
   const errors = validationResult(req).array();
@@ -129,9 +132,9 @@ router.post("/result", ensureToken, auth.resultvalidation, async function (
         const qustionsans = result.qustionsans;
         const total = Object.keys(qustionsans).length;
         const studentemail = authData.email;
-
-        let mark = await helper.check_value(qustionsans, total);
-        let persantage = (mark / total) * 100;
+        
+        const mark = await helper.check_value(qustionsans, total);
+        const persantage = (mark / total) * 100;
         const msg =
           `RESULT
             mark : ` +
@@ -170,6 +173,7 @@ router.post("/result", ensureToken, auth.resultvalidation, async function (
 
 router.post("/takeexam", ensureToken, function (req, res) {
   const authData = req.authData;
+  console.log('authData', authData)
   const sub_id = req.body.sub_id;
   if (!sub_id) {
     return res
@@ -191,6 +195,7 @@ router.post("/takeexam", ensureToken, function (req, res) {
           { $unwind: "$question_detail" },
           {
             $project: {
+              id:"$question_detail._id",
               question: "$question_detail.q_name",
               option: "$question_detail.option",
             },

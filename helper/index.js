@@ -46,19 +46,26 @@ helper.cron = (email, msg, time) => {
   });
 };
 
-helper.detail = (response) => {
-  for (let i = 0; i < Object.keys(response).length; i++) {
-    let r = response[i].student_result;
-    let total = Object.keys(r).length;
+helper.detail = async (response) => {
+  
+  console.log('response', response)
+  for (let i = 0; i < response.length; i++) {
+    const studentDetails = response[i]
+    let studentResults = response[i].student_result;
+    console.log('studentResults', studentResults)
+  
+    let total = studentResults.length;
     let per = 0;
     for (let j = 0; j < total; j++) {
-      per += r[j].persantage;
+      per += studentResults[j].persantage;
     }
     const result = per / total;
-    if (!r[i]) {
+    console.log('result', result)
+    if (!result) {
       continue;
     }
-    Student.findByIdAndUpdate(r[i].s_id, { result: result });
+    const as= await Student.findByIdAndUpdate(studentDetails._id, { result: result });
+    console.log("as:" + as);
   }
 };
 

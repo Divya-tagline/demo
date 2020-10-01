@@ -22,10 +22,9 @@ router.get("/", function (req, res, next) {
   });
 });
 
-router.get("/getallstudentresult", ensureToken, async function (req, res) {
-  //console.log("inresult");
+router.get("/getallstudentresult", async function (req, res) {1
   const authData = req.authData;
-  Student.aggregate(
+  await Student.aggregate(
     [
       {
         $lookup: {
@@ -48,7 +47,8 @@ router.get("/getallstudentresult", ensureToken, async function (req, res) {
   ) {
     response.map((sInfo) => {
       if (!sInfo.result) sInfo.result = 00;
-      const message = `\nStudent Name : ${sInfo.s_name} & Result : ${sInfo.result}`;
+      let message = { name: sInfo.s_name, Result: sInfo.result };
+      console.log(message);
       result.push(message);
     });
   });
@@ -88,7 +88,9 @@ router.post("/signup", auth.validation, function (req, res, next) {
 
 router.post("/login", auth.loginvalidation, function (req, res) {
   const teacher = req.body;
+  console.log("teacher", teacher);
   const errors = validationResult(req).array();
+  console.log("errors", errors);
   if (errors.length) {
     return res
       .status(config.BAD_REQUEST)
@@ -96,11 +98,11 @@ router.post("/login", auth.loginvalidation, function (req, res) {
   } else {
     Teacher.findOne({ t_email: teacher.email }, function (err, teach) {
       
-      if (err) res.json(err);
+      if (!teach) return res.status(config.BAD_REQUEST).json({ message: "Email Not exit" });
       if (!bcrypt.compareSync(teacher.password, teach.t_password))
         return res
           .status(config.BAD_REQUEST)
-          .json({ message: "password Invaild" });
+          .json({ message: " password Invaild" });
       let data = {
         email: teach.t_email,
         password: teach.t_password,
@@ -120,6 +122,14 @@ router.post("/login", auth.loginvalidation, function (req, res) {
       });
     });
   }
+});
+
+router.get("/getsubjects", (req, res) => {
+  Subject.find(function (err, response) {
+    if (err) res.json(err);
+    console.log(response);
+    res.json(response);
+  });
 });
 
 router.get("/logout", function (req, res) {
@@ -168,10 +178,7 @@ router.post("/subjectadd", ensureToken, function (req, res) {
     });
   }
 });
-router.post("/questionadd", ensureToken, auth.questionaddvalidation, function (
-  req,
-  res
-) {
+router.post("/questionadd", ensureToken, function (req, res) {
   const authData = req.authData;
   const errors = validationResult(req).array();
   console.log("\n errors : ", errors);
@@ -180,15 +187,15 @@ router.post("/questionadd", ensureToken, auth.questionaddvalidation, function (
       .status(config.BAD_REQUEST)
       .json({ message: "Validation Error", data: {}, errors });
   } else {
-    Teacher.findOne({ t_email: authData.email }, function (err, std) {
+    Teacher.findOne({ t_email: authData.email }, async function (err, std) {
       if (std) {
         //Qustion add
         var question = req.body.questions;
         try {
-          Qustion.insertMany(question);
+          const q = await Qustion.insertMany(question);
           res
             .status(config.OK_STATUS)
-            .json({ message: "Question added", Data: question });
+            .json({ message: "Question added", Data: q });
         } catch (e) {
           console.log(e);
           res.json(e);
