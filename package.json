@@ -18,9 +18,16 @@
     "express-validator": "^6.6.1",
     "http-errors": "~1.6.3",
     "http-proxy-middleware": "^1.0.5",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.10",
     "morgan": "~1.9.1",
+    "node-cron": "^2.0.3",
+    "nodemailer": "^6.4.14",
     "nodemon": "^2.0.4",
-    "pug": "2.0.0-beta11"
+    "pug": "2.0.0-beta11",
+    "redis": "^3.0.2",
+    "swagger-jsdoc": "^5.0.0",
+    "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
     "webpack-dev-server": "^3.11.0"

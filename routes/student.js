@@ -14,10 +14,30 @@ const helper = require("../helper");
 const ensureToken = require("../middlewares/ensureToken").student;
 const { ObjectID } = require("mongodb");
 const config = require("../config");
-router.get("/", function (req, res, next) {
+const redis = require("redis");
+const client = redis.createClient();
+
+client.on("error", function(error) {
+  console.error(error);
+});
+const redis_api = (req ,res , next) => {
+  client.get('STUDENT_DATA',(err , redis_data)=>{
+    if(err){
+      throw err;
+    }else if(redis_data)
+    {
+        console.log('redis_data', redis_data)
+        res.send(JSON.parse(redis_data));
+    }
+    else{
+      next()
+    }
+  })
+}
+router.get("/",redis_api, function (req, res, next) {
   Student.find(function (err, response) {
     if (err) res.json(err);
-    console.log(response);
+    client.setex("STUDENT_DATA",60,JSON.stringify(response))
     res.json(response);
   });
 });
@@ -64,6 +84,7 @@ router.post("/signup", auth.validation, function (req, res, next) {
 });
 
 router.get("/logout", function (req, res) {
+  client.set("DATA","hello");
   req.session.destroy(function () {
     console.log("student logged out.");
   });
