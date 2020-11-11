@@ -32,6 +32,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+app.get('/', (req, res) => {
+  res.send('App is running');
+})
 app.use('/student', studentRouter);
 app.use('/teacher', teacherRouter);
 
