@@ -4,7 +4,12 @@ const Student = require("../modal/student_modal");
 const Subject = require("../modal/subject_modal");
 const auth = require("../helper/verification");
 const session = require("express-session");
-router.use(session({ secret: "Secret key" }));
+let RedisStore = require('connect-redis')(session)
+router.use( session({
+  store: new RedisStore({ client: redisClient }),
+  secret: "Secret key" ,
+  resave: false,
+}));
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
@@ -16,6 +21,7 @@ const { ObjectID } = require("mongodb");
 const config = require("../config");
 const redis = require("redis");
 const client = redis.createClient();
+
 
 client.on("error", function(error) {
   console.error(error);
@@ -34,7 +40,7 @@ const redis_api = (req ,res , next) => {
     }
   })
 }
-router.get("/",redis_api, function (req, res, next) {
+router.get("/",redis_api, function (req, res, next) { 
   Student.find(function (err, response) {
     if (err) res.json(err);
     client.setex("STUDENT_DATA",60,JSON.stringify(response))
@@ -50,9 +56,6 @@ router.post("/signup", auth.validation, function (req, res, next) {
       .status(config.BAD_REQUEST)
       .json({ message: "Validation Error", data: {}, errors });
   } else {
-    /*  if (studentInfo.password !== studentInfo.con_password) {
-      return res.json({ message: "password and confirm password not match" });
-    }*/
     const hash = bcrypt.hashSync(studentInfo.password, saltRounds);
     var newStudent = new Student({
       s_name: studentInfo.name,

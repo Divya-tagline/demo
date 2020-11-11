@@ -7,7 +7,9 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "@types/connect-redis": "0.0.15",
     "bcrypt": "^5.0.0",
+    "connect-redis": "^5.0.0",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
