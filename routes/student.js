@@ -4,11 +4,11 @@ const Student = require("../modal/student_modal");
 const Subject = require("../modal/subject_modal");
 const auth = require("../helper/verification");
 const session = require("express-session");
-const redis = require("redis");
-const client = redis.createClient();
-let RedisStore = require('connect-redis')(session)
+// const redis = require("redis");
+// const client = redis.createClient();
+// let RedisStore = require('connect-redis')(session)
 router.use( session({
-  store: new RedisStore({ client: client }),
+  // store: new RedisStore({ client: client }),
   secret: "Secret key" ,
   resave: false,
 }));
@@ -27,26 +27,26 @@ const config = require("../config");
 client.on("error", function(error) {
   console.error(error);
 });
-const redis_api = (req ,res , next) => {
-  client.get('STUDENT_DATA',(err , redis_data)=>{
-    if(err){
-      throw err;
-    }else if(redis_data)
-    {
-        console.log('redis_data', redis_data)
-        res.send(JSON.parse(redis_data));
-    }
-    else{
-      next()
-    }
-  })
+// const redis_api = (req ,res , next) => {
+//   client.get('STUDENT_DATA',(err , redis_data)=>{
+//     if(err){
+//       throw err;
+//     }else if(redis_data)
+//     {
+//         console.log('redis_data', redis_data)
+//         res.send(JSON.parse(redis_data));
+//     }
+//     else{
+//       next()
+//     }
+//   })
   
-}
+// }
 
 router.get("/",redis_api, async (req, res, next) => { 
   try {
     const student_detail = await Student.find();
-    client.setex("STUDENT_DATA",60,JSON.stringify(student_detail))
+    // client.setex("STUDENT_DATA",60,JSON.stringify(student_detail))
     res.json(student_detail);
   } catch (error) {
     console.log('error', error)
