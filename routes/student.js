@@ -4,9 +4,11 @@ const Student = require("../modal/student_modal");
 const Subject = require("../modal/subject_modal");
 const auth = require("../helper/verification");
 const session = require("express-session");
+const redis = require("redis");
+const client = redis.createClient();
 let RedisStore = require('connect-redis')(session)
 router.use( session({
-  store: new RedisStore({ client: redisClient }),
+  store: new RedisStore({ client: client }),
   secret: "Secret key" ,
   resave: false,
 }));
@@ -19,8 +21,7 @@ const helper = require("../helper");
 const ensureToken = require("../middlewares/ensureToken").student;
 const { ObjectID } = require("mongodb");
 const config = require("../config");
-const redis = require("redis");
-const client = redis.createClient();
+
 
 
 client.on("error", function(error) {
@@ -39,16 +40,22 @@ const redis_api = (req ,res , next) => {
       next()
     }
   })
+  
 }
-router.get("/",redis_api, function (req, res, next) { 
-  Student.find(function (err, response) {
-    if (err) res.json(err);
-    client.setex("STUDENT_DATA",60,JSON.stringify(response))
-    res.json(response);
-  });
+
+router.get("/",redis_api, async (req, res, next) => { 
+  try {
+    const student_detail = await Student.find();
+    client.setex("STUDENT_DATA",60,JSON.stringify(student_detail))
+    res.json(student_detail);
+  } catch (error) {
+    console.log('error', error)
+    return res.status(400).json({ message: "something wrong", error: error });
+  }
+  
 });
 
-router.post("/signup", auth.validation, function (req, res, next) {
+router.post("/signup", auth.validation,async  (req, res, next) => {
   const errors = validationResult(req).array();
   const studentInfo = req.body;
   if (errors.length) {
@@ -63,23 +70,15 @@ router.post("/signup", auth.validation, function (req, res, next) {
       s_email: studentInfo.email,
     });
     try {
-      Student.findOne({ s_email: studentInfo.email }, function (err, student) {
-        if (student)
-          return res
+      const student_detail = await Student.findOne({ s_email: studentInfo.email });
+      if (student_detail) {
+        return res
             .status(config.BAD_REQUEST)
-            .json({ auth: false, message: "email exits" });
-        newStudent.save(function (err, Std) {
-          if (err)
-            res
-              .status(config.SERVER_ERROR)
-              .json({ message: "Database error", type: "error", error: err });
-          else {
-            res
-              .status(config.OK_STATUS)
-              .json({ message: "your registere sucssfully", data: { Std } });
-          }
-        });
-      });
+            .json({ auth: false, message: "email already exits" });
+      }
+      const new_student =  newStudent.save();
+      res.status(config.OK_STATUS)
+              .json({ message: "your register sucssfully", data: { new_student } });
     } catch (e) {
       return res.status(config.BAD_REQUEST).json({ message: "Bad request" });
     }
@@ -127,6 +126,7 @@ router.post("/login", auth.loginvalidation, async function (req, res) {
             req.session.std = std;
             res.status(config.OK_STATUS).json({
               token: token,
+              message: "Login Sucssfully"
             });
           }
         });
