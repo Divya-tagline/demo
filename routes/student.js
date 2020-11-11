@@ -24,9 +24,9 @@ const config = require("../config");
 
 
 
-client.on("error", function(error) {
-  console.error(error);
-});
+// client.on("error", function(error) {
+//   console.error(error);
+// });
 // const redis_api = (req ,res , next) => {
 //   client.get('STUDENT_DATA',(err , redis_data)=>{
 //     if(err){
@@ -43,7 +43,7 @@ client.on("error", function(error) {
   
 // }
 
-router.get("/",redis_api, async (req, res, next) => { 
+router.get("/", async (req, res, next) => { 
   try {
     const student_detail = await Student.find();
     // client.setex("STUDENT_DATA",60,JSON.stringify(student_detail))
