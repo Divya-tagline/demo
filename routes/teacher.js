@@ -50,12 +50,10 @@ router.get("/getallstudentresult", async function (req, res) {1
     response.map((sInfo) => {
       if (!sInfo.result) sInfo.result = 00;
       let message = { name: sInfo.s_name, Result: sInfo.result };
-      console.log(message);
       result.push(message);
     });
   });
   res.json(result);
-  console.log("result => " + result);
 });
 router.post("/signup", auth.validation, function (req, res, next) {
   const teacherInfo = req.body; //Get the parsed information
@@ -90,7 +88,6 @@ router.post("/signup", auth.validation, function (req, res, next) {
 
 router.post("/login", auth.loginvalidation, function (req, res) {
   const teacher = req.body;
-  console.log("teacher", teacher);
   const errors = validationResult(req).array();
   console.log("errors", errors);
   if (errors.length) {

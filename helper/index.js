@@ -13,16 +13,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 helper.check_value = async function check_value(result, n) {
-  console.log("in the check value");
   let mark = 0;
   for (var i = 0; i < n; i++) {
-    console.log('i=>', i)
     var ans = result[i].ans;
     var y = result[i].questionId;
-    console.log('ans', ans)
-    console.log('y => ', y)
     await Qustion.findById(y, function (err, responce) {
-      console.log('responce', responce)
       if (responce.answer == ans) {
         mark++;
       }
@@ -53,11 +48,9 @@ helper.cron = (email, msg, time) => {
 
 helper.detail = async (response) => {
   
-  console.log('response', response)
   for (let i = 0; i < response.length; i++) {
     const studentDetails = response[i]
     let studentResults = response[i].student_result;
-    console.log('studentResults', studentResults)
   
     let total = studentResults.length;
     let per = 0;
@@ -65,12 +58,10 @@ helper.detail = async (response) => {
       per += studentResults[j].persantage;
     }
     const result = per / total;
-    console.log('result', result)
     if (!result) {
       continue;
     }
     const as= await Student.findByIdAndUpdate(studentDetails._id, { result: result });
-    console.log("as:" + as);
   }
 };
 

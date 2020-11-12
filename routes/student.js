@@ -45,7 +45,6 @@ const config = require("../config");
 // }
 
 router.get("/", async (req, res, next) => { 
-  console.log("In student api");
   try {
     const student_detail = await Student.find();
     // client.setex("STUDENT_DATA",60,JSON.stringify(student_detail))
@@ -108,7 +107,6 @@ router.post("/login", auth.loginvalidation, async function (req, res) {
   } else {
     // try{
     await Student.findOne({ s_email: student.email }, function (err, std) {
-      console.log(std);
       try {
         if (!bcrypt.compareSync(student.password, std.s_password))
           return res
@@ -159,7 +157,6 @@ router.post("/result", ensureToken, auth.resultvalidation, async function (
         const qustionsans = result.qustionsans;
         const total = Object.keys(qustionsans).length;
         const studentemail = authData.email;
-        console.log('qustionsans', qustionsans)
         const mark = await helper.check_value(qustionsans, total);
         const persantage = (mark / total) * 100;
         const msg =
@@ -200,7 +197,6 @@ router.post("/result", ensureToken, auth.resultvalidation, async function (
 
 router.post("/takeexam", ensureToken, function (req, res) {
   const authData = req.authData;
-  console.log('authData', authData)
   const sub_id = req.body.sub_id;
   if (!sub_id) {
     return res
@@ -230,7 +226,6 @@ router.post("/takeexam", ensureToken, function (req, res) {
         ];
 
         const resp = await Subject.aggregate(defaultQuery);
-        console.log("\n resp : ", resp);
         return res
           .status(config.OK_STATUS)
           .json({ message: "Qustions: ", Data: resp });
