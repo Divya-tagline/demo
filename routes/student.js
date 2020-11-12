@@ -9,6 +9,7 @@ const session = require("express-session");
 // let RedisStore = require('connect-redis')(session)
 router.use( session({
   // store: new RedisStore({ client: client }),
+  saveUninitialized:true,
   secret: "Secret key" ,
   resave: false,
 }));
@@ -44,6 +45,7 @@ const config = require("../config");
 // }
 
 router.get("/", async (req, res, next) => { 
+  console.log("In student api");
   try {
     const student_detail = await Student.find();
     // client.setex("STUDENT_DATA",60,JSON.stringify(student_detail))

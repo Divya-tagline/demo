@@ -3,7 +3,9 @@ const router = express.Router();
 const auth = require("../helper/verification");
 const helper = require("../helper");
 const session = require("express-session");
-router.use(session({ secret: "Secret key" }));
+router.use(session({saveUninitialized:true,
+  secret: "Secret key" ,
+  resave: false,  }));
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const ensureToken = require("../middlewares/ensureToken").teacher;

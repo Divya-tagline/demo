@@ -16,7 +16,8 @@ if (result.error) {
  
 //database connect
 const mongoose = require("mongoose");
-mongoose.connect(con.DATABASE_URL);
+console.log('process.env.DATABASE_URL', process.env.DATABASE_URL)
+mongoose.connect(process.env.DATABASE_URL,{ useUnifiedTopology: true });
 mongoose.set('useFindAndModify', false);
 
 const app = express();
