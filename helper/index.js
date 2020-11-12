@@ -13,11 +13,16 @@ const transporter = nodemailer.createTransport({
   },
 });
 helper.check_value = async function check_value(result, n) {
+  console.log("in the check value");
   let mark = 0;
   for (var i = 0; i < n; i++) {
+    console.log('i=>', i)
     var ans = result[i].ans;
     var y = result[i].questionId;
+    console.log('ans', ans)
+    console.log('y => ', y)
     await Qustion.findById(y, function (err, responce) {
+      console.log('responce', responce)
       if (responce.answer == ans) {
         mark++;
       }

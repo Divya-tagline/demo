@@ -155,10 +155,11 @@ router.post("/result", ensureToken, auth.resultvalidation, async function (
       if (std) {
         //authorized
         const result = req.body;
+        
         const qustionsans = result.qustionsans;
         const total = Object.keys(qustionsans).length;
         const studentemail = authData.email;
-        
+        console.log('qustionsans', qustionsans)
         const mark = await helper.check_value(qustionsans, total);
         const persantage = (mark / total) * 100;
         const msg =
