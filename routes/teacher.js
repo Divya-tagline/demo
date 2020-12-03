@@ -3,7 +3,12 @@ const router = express.Router();
 const auth = require("../helper/verification");
 const helper = require("../helper");
 const session = require("express-session");
-router.use(session({saveUninitialized:true,
+const redis = require("redis");
+const client = redis.createClient();
+let RedisStore = require('connect-redis')(session)
+router.use(session({
+  store: new RedisStore({ client: client }),
+  saveUninitialized:true,
   secret: "Secret key" ,
   resave: false,  }));
 const jwt = require("jsonwebtoken");
@@ -16,12 +21,15 @@ const Teacher = require("../modal/teacher_modal");
 const Subject = require("../modal/subject_modal");
 const Qustion = require("../modal/question_modal");
 const Student = require("../modal/student_modal");
-router.get("/", function (req, res, next) {
-  Teacher.find(function (err, response) {
-    if (err) res.json(err);
-    console.log(response);
-    res.json(response);
-  });
+router.get("/", async function (req, res, next) {
+  try {
+    const teacher_detail = await Teacher.find();
+    client.setex(req.originalUrl,60,JSON.stringify(teacher_detail))
+    res.json(teacher_detail);
+  } catch (error) {
+    console.log('error', error)
+    return res.status(400).json({ message: "something wrong", error: error });
+  }
 });
 
 router.get("/getallstudentresult", async function (req, res) {1

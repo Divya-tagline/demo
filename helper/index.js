@@ -5,6 +5,9 @@ const nodemailer = require("nodemailer");
 const Student = require("../modal/student_modal");
 const result = require("dotenv");
 result.config();
+const redis = require("redis");
+const client = redis.createClient();
+
 const transporter = nodemailer.createTransport({
   service: process.env.SERVICE,
   auth: {
@@ -67,4 +70,26 @@ helper.detail = async (response) => {
 
 helper.sendmail = (email, msg) => {};
 
+helper.redis_api = (req ,res , next) => {
+
+  client.get(req.originalUrl,(err , redis_data)=>{
+    if(err){
+      throw err;
+    }else if(redis_data)
+    {
+        console.log('redis_data', redis_data)
+        res.send(JSON.parse(redis_data));
+    }
+    else{
+      next()
+    }
+  })
+
+  
+};
+
+helper.set_redis = (key,data) =>{
+  client.setex(key,60,JSON.stringify(data))
+
+}
 module.exports = helper;
